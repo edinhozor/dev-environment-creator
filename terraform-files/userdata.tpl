@@ -27,6 +27,11 @@ echo \
   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
+# Add Kubernetes apt repository
+echo "Adding Kubernetes apt repository..."
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list > /dev/null
+
 # Update the apt package index again
 echo "Updating apt package index..."
 sudo apt update
@@ -38,6 +43,17 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io
 # Check Docker version
 echo "Docker version:"
 docker --version
+
+# Install Kubernetes components
+echo "Installing Kubernetes components..."
+sudo apt install -y kubelet kubeadm kubectl
+
+# Hold Kubernetes components at their current version to prevent automatic upgrades
+sudo apt-mark hold kubelet kubeadm kubectl
+
+# Check Kubernetes version
+echo "Kubernetes version:"
+kubectl version --short
 
 # Add current user to the docker group to run Docker commands without sudo
 echo "Adding current user to the docker group..."
